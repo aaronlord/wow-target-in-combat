@@ -1,0 +1,8 @@
+## Interface: 40300
+## Title: TargetInCombat
+## Notes: Displays combat state for target and focus
+## Version: 1
+## Author: Aaron Lord (Nugis)
+## DefaultState: Enabled
+
+targetincombat.lua
