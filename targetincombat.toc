@@ -1,4 +1,4 @@
-## Interface: 40300
+## Interface: 50400
 ## Title: TargetInCombat
 ## Notes: Displays combat state for target and focus
 ## Version: 1

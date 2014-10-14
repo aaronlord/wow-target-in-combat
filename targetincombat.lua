@@ -1,32 +1,45 @@
--- Set up the combat icon & anchor it to a frame
-local function ApplyTextures(frame, anchor)
-	frame.texture = frame:CreateTexture()
-	frame.texture:SetTexture("Interface\\CHARACTERFRAME\\UI-StateIcon.blp")
-	frame.texture:SetTexCoord(0.5,1,0,0.49);
-	frame.texture:SetAllPoints(frame)
-	frame:SetWidth(21)
-	frame:SetHeight(21)
-	frame:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMRIGHT", -22, 12)
-	frame:Show()
+local iconWidth  = 30
+local iconHeight = 30
+
+local function AddCombatIconTextureTo(frame)
+	local texture = frame:CreateTexture(nil, "BACKGROUND")
+	
+	texture:SetTexture("Interface\\CHARACTERFRAME\\UI-StateIcon.blp")
+	texture:SetTexCoord(.5, 1, 0, .49) -- sprite leak. booo
+	texture:SetWidth(iconWidth)
+	texture:SetHeight(iconHeight)
+	texture:SetPoint("CENTER")
+	
+	return texture
 end
 
--- Update the combat state
-local function FrameOnUpdate(self, unit)
+local function CreateCombatIconFrameOn(parentFrame, unitName)
+	local frame = CreateFrame("Frame", nil, parentFrame)
+
+	frame:SetWidth(iconWidth)
+	frame:SetHeight(iconHeight)
+	frame:SetPoint("BOTTOMRIGHT", parentFrame, "BOTTOMRIGHT", -36, 21)
+	frame:Hide()
+
+	AddCombatIconTextureTo(frame)
+	RaiseFrameLevel(frame)
+
+	return frame
+end
+
+local function ToggleFrameOnUnitUpdate(frame, unit)
 	if UnitAffectingCombat(unit) then
-		self:Show()
+		frame:Show()
 	else
-		self:Hide()
+		frame:Hide()
 	end
 end
 
--- Target frame
-local target         = CreateFrame("Frame")
-local target_handler = CreateFrame("Frame")
-ApplyTextures(target, TargetFrame)
-target_handler:SetScript("OnUpdate", function(self) FrameOnUpdate(target, "target") end)
+local targetCombatIconFrame = CreateCombatIconFrameOn(TargetFrame)
+local focusCombatIconFrame = CreateCombatIconFrameOn(FocusFrame)
 
--- Focus frame
-local focus         = CreateFrame("Frame")
-local focus_handler = CreateFrame("Frame")
-ApplyTextures(focus, FocusFrame)
-focus_handler:SetScript("OnUpdate", function(self) FrameOnUpdate(focus, "focus") end)
+local handlerFrame = CreateFrame("Frame", nil, UIParent)
+handlerFrame:SetScript("OnUpdate", function (self)
+	ToggleFrameOnUnitUpdate(targetCombatIconFrame, "target")
+	ToggleFrameOnUnitUpdate(focusCombatIconFrame, "focus")
+end)
